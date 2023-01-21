@@ -4,7 +4,7 @@
     };
 
     outputs = {self, nixpkgs, flake-parts}: let
-        forEachSystem = systems: callback: lib.genAttrs systems (system:
+        forEachSystem = systems: callback: nixpkgs.lib.genAttrs systems (system:
             let pkgs = nixpkgs.legacyPackages.${system}; in
             callback system pkgs
         );
@@ -14,7 +14,7 @@
     {
         devShells = forEachSystem defaultSystems (system: pkgs: {
             default = pkgs.mkShell {
-                package = with pkgs; [
+                packages = with pkgs; [
                     nodejs
                     nodePackages.yarn
                 ];
