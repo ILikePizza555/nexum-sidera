@@ -1,0 +1,9 @@
+{
+  "name": "nexum-sidera",
+  "version": "1.0.0",
+  "description": "A futuristic web browser concept",
+  "main": "index.js",
+  "repository": "https://github.com/ILikePizza555/nexum-sidera",
+  "author": "Izzy Lancaster <izzylan@Izzy-Luna.local>",
+  "license": "GPL3"
+}
