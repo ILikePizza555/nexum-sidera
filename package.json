@@ -5,5 +5,15 @@
   "main": "index.js",
   "repository": "https://github.com/ILikePizza555/nexum-sidera",
   "author": "Izzy Lancaster <izzylan@Izzy-Luna.local>",
-  "license": "GPL3"
+  "license": "GPL3",
+  "devDependencies": {
+    "@types/electron": "^1.6.10",
+    "electron": "^22.0.3",
+    "typescript": "^4.9.4"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "start": "npm run build && electron ./dist/main.js"
+  }
 }
