@@ -102,3 +102,7 @@ dist
 
 # TernJS port file
 .tern-port
+
+.shadow-cljs
+resources/public/js
+resources/main.js
