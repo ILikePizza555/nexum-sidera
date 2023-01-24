@@ -1,5 +1,5 @@
 {:source-paths ["src"]
- :dependencies [[reagent "1.1.1"]]
+ :dependencies [[reagent "1.1.1"] [cider/cider-nrepl "0.29.0"]]
  :dev-http {8080 "resources/public/"}
  :builds {:main {:target :node-script
                  :output-to "resources/main.js"

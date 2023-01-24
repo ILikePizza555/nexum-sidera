@@ -106,3 +106,6 @@ dist
 .shadow-cljs
 resources/public/js
 resources/main.js
+.clj-kindo
+.lsp
+.calva
