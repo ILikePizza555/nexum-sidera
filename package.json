@@ -8,6 +8,7 @@
   "license": "GPL-3.0-only",
   "devDependencies": {
     "electron": "^22.0.3",
+    "electron-devtools-installer": "^3.2.0",
     "shadow-cljs": "^2.20.20"
   },
   "scripts": {
