@@ -9,14 +9,22 @@
 (defonce state (atom 0))
 
 (defn root-component []
-  [:div
-   [:div.logos
-    [:img.electron {:src "img/electron-logo.png"}]
-    [:img.cljs {:src "img/cljs-logo.svg"}]
-    [:img.reagent {:src "img/reagent-logo.png"}]]
-   [:button
-    {:on-click #(swap! state inc)}
-    (str "Clicked " @state " times")]])
+  [:ul.tree-view.tree-view-group.tree-view-root
+   [:li.tree-view.tree-view-item "Leaf Component"]
+   [:li.tree-view.tree-view-group "Subtree"
+    [:ul
+     [:li "Leaf 1"]
+     [:li "Leaf 2"]
+     [:li "Leaf 3"]]]
+   [:li.tree-view "Subtree with sub-subtree"
+    [:ul
+     [:li "Leaf 1"]
+     [:li "Sub-subtree"
+      [:ul
+       [:li "Leaf 2"]
+       [:li "Leaf 3"]
+       [:li "Leaf 4"]]]
+     [:li "Leaf 5"]]]])
 
 (defn ^:dev/after-load start! []
   (.render root (as-element [root-component])))
