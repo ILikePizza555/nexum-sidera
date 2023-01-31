@@ -1,9 +1,11 @@
 (ns renderer.core
-  (:require [reagent.core :refer [atom]]
-            [reagent.dom :as rd]))
+  (:require [reagent.core :refer [atom as-element]]
+            [reagent.dom :as rd]
+            ["react-dom/client" :refer [createRoot]]))
 
 (enable-console-print!)
 
+(defonce root (createRoot (js/document.getElementById "app-container")))
 (defonce state (atom 0))
 
 (defn root-component []
@@ -17,6 +19,4 @@
     (str "Clicked " @state " times")]])
 
 (defn ^:dev/after-load start! []
-  (rd/render
-   [root-component]
-   (js/document.getElementById "app-container")))
+  (.render root (as-element [root-component])))
