@@ -6,14 +6,22 @@
 (enable-console-print!)
 
 (defonce root (createRoot (js/document.getElementById "app-container")))
-(defonce state (atom 0))
+
+(defn collapse [is-collapsed & children]
+  (js/console.log "Collapse render " is-collapsed)
+  (into
+   [:div.collapse {:class (when is-collapsed "active")}] children))
 
 (defn tree-view-item [{:keys [label]} & children]
-  [:li.tree-view-item 
-   [:div 
-    [:span.icon-container (if children "\u25B9" ())]
-    [:span.label label]]
-   (if children [:ul.tree-view-group children] ())])
+  (let [is-collapsed (atom false)]
+    (fn [{:keys [label]} & children]
+      [:li.tree-view-item 
+       [:div
+        {:on-click #(swap! is-collapsed not)}
+        [:span.icon-container (when children "\u25B9")]
+        [:span.label label]]
+       (when children [collapse @is-collapsed
+                       (into [:ul.tree-view-group] children)])])))
 
 (defn root-component []
   [:ul.tree-view-group.tree-view-root
