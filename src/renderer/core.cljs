@@ -4,7 +4,8 @@
             [helix.hooks :as hooks]
             ["react-dom/client" :as rdom]
             [dv.cljs-emotion :refer [defstyled]]
-            ["@react-spring/web" :refer [animated useSpring]]))
+            ["@react-spring/web" :refer [animated useSpring]]
+            ["react-use-measure" :as use-measure]))
 
 (enable-console-print!)
 
@@ -14,10 +15,11 @@
    :padding 0
    :user-select "none"})
 
-(defstyled tree-content :ul
+(defstyled tree-content animated.ul
   {:list-style-type "none"
    :margin 0
-   :padding-inline-start "1em"})
+   :padding-inline-start "1em"
+   :overflow "hidden"})
 
 (defstyled tree-header :div
   {:display "flex"
@@ -49,13 +51,22 @@
 
 (defnc tree [{:keys [title children defaultOpen] :or {defaultOpen true}}]
   (let [[isOpen setOpen] (hooks/use-state defaultOpen)
+        [ref bounds] (use-measure)
+        viewHeight (.-height bounds)
+        springFrom #js {:height 0 :opacity 0 :y 0}
+        springTo #js {:height (if isOpen viewHeight 0)
+                      :opacity (if isOpen 1 0)
+                      :y (if isOpen 20 0)}
+        styleValues (useSpring #js {:from springFrom :to springTo})
         icon (when children (if isOpen ($ MinusSquare) ($ PlusSquare)))] 
     (d/li
      (tree-header
       {:onClick #(setOpen (not isOpen))}
       (tree-icon icon)
       (tree-title title))
-     (when children (tree-content children)))))
+     (when children (tree-content {:style {:opacity (.-opacity styleValues)
+                                           :height (.-height styleValues)}}
+                     ($ animated.div {:ref ref :style {:y (.-y styleValues)}} children))))))
 
 (defnc app []
   (tree-root
