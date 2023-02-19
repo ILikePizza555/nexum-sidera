@@ -61,6 +61,7 @@
       {:onClick #(setOpen (not isOpen))}
       (tree-icon icon)
       (tree-title title))
-     (when children (tree-content {:style {:opacity (.-opacity styleValues)
-                                           :height (.-height styleValues)}}
-                                  ($ animated.div {:ref ref :style {:y (.-y styleValues)}} children))))))
+     (when children (tree-content
+                     {:style {:opacity (.-opacity styleValues)
+                              :height (.-height styleValues)}}
+                     ($ animated.div {:ref ref :style {:y (.-y styleValues)}} children))))))
