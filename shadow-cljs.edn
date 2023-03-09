@@ -1,5 +1,7 @@
 {:source-paths ["src"]
- :dependencies [[cider/cider-nrepl "0.29.0"] [lilactown/helix "0.1.9"] [dv/cljs-emotion "2022-12-27.0.0"]]
+ :dependencies [[cider/cider-nrepl "0.29.0"]
+                [lilactown/helix "0.1.9"]
+                [dv/cljs-emotion "2022-12-27.0.0"]]
  :dev-http {8080 "resources/public/"}
  :builds {:main {:target :node-script
                  :output-to "resources/main.js"
