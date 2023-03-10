@@ -109,3 +109,5 @@ resources/main.js
 .clj-kindo
 .lsp
 .calva
+
+.direnv/
