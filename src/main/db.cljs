@@ -1,7 +1,7 @@
 (ns main.db
   (:require ["sqlite3" :as sqlite3]
             [lambdaisland.glogi :as log]
-            [cljs.core.async :refer [put!]]))
+            [cljs.core.async :refer [chan put! close!]]))
 
 (defn create-connection [path]
   (let [sqlite3 (.verbose sqlite3)
@@ -11,33 +11,51 @@
         (.on "profile" #(log/trace :query %1 :execution-time %2)))))
 
 (defn ^:private run-cb [out]
-  (fn [err] (if err
-              (put! out {:error err})
-              (this-as this
-                       (put! out {:last-id (.lastID this)
-                                  :changes (.changes this)})))))
+  (fn [err] 
+    (if err 
+      (put! out {:error err})
+      (this-as ^object this
+               (put! out {:last-id (.lastID this) 
+                          :changes (.changes this)})))
+    (close! out)))
 
 (defn run
   "CLJS Wrapper around the [sqlite3/Database.run()](https://github.com/TryGhost/node-sqlite3/wiki/API#runsql--param---callback) method.
-   Calls `run()` on the provided function with the provided `sql` query string, cljs->js converted `params`, and a callback function which puts
-   the result of the query -- or any errors -- on the `out` channel."
-  ([db sql params] (run db sql params nil))
-  ([db sql params out]
-   (.run db sql (clj->js params)
-         (when out (run-cb out)))))
+   
+   `db` - The `sqlite3/Database` object.
+
+   `sql` - The sql query string to execute
+
+   `params` - The params to bind to the query. This is automatically convered to a JS object.
+
+   Returns a channel which will be used to output the results of the callback.
+   "
+  ([db sql params]
+   (let [out chan]
+     (.run db sql (clj->js params) (run-cb out))
+     out)))
 
 (defn prepare
-  ([db sql] (prepare db sql [] nil))
-  ([db sql params] (prepare db sql params nil))
-  ([db sql params out]
-   (.prepare db sql (clj->js params)
-             (when out (fn [err] (if err
-                                   (put! out {:error err})
-                                   (put! out :success)))))))
+  "CLJS Wrapper around the [sqlite3/Database.prepare()](https://github.com/TryGhost/node-sqlite3/wiki/API#preparesql--param---callback) method.
+   
+   `db` - The `sqlite3/Database` object.
+   
+   `sql` - The sql query to make into a prepared statement.
+   
+   `params` - (Optional) The parameters to bind to the statement. This is automatically converted to a JS object.
+   
+   Returns a channel which wil be used to output the results of the callback. On success, the channel will output `:success` and close."
+  ([db sql] (prepare db sql []))
+  ([db sql params]
+   (let [out chan]
+     (.prepare db sql (clj->js params) (fn [err] 
+                                         (if err (put! out {:error err}) (put! out :success))
+                                         (close! out)))
+     out)))
 
 (defn statement-run
-  ([stmt] (statement-run stmt [] nil))
-  ([stmt params] (statement-run stmt params nil))
-  ([stmt params out]
-   (.run stmt (clj->js params)
-         (when out (run-cb out)))))
+  ([stmt] (statement-run stmt []))
+  ([stmt params]
+   (let [out chan] 
+     (.run stmt (clj->js params) (run-cb out))
+     out)))
