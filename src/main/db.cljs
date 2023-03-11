@@ -15,8 +15,8 @@
     (if err 
       (put! out {:error err})
       (this-as ^object this
-               (put! out {:last-id (.lastID this) 
-                          :changes (.changes this)})))
+               (put! out {:last-id (.-lastID this) 
+                          :changes (.-changes this)})))
     (close! out)))
 
 (defn run
@@ -30,8 +30,8 @@
 
    Returns a channel which will be used to output the results of the callback.
    "
-  ([db sql params]
-   (let [out chan]
+  ([db sql params] 
+   (let [out (chan)]
      (.run db sql (clj->js params) (run-cb out))
      out)))
 
@@ -44,18 +44,19 @@
    
    `params` - (Optional) The parameters to bind to the statement. This is automatically converted to a JS object.
    
-   Returns a channel which wil be used to output the results of the callback. On success, the channel will output `:success` and close."
+   Returns a channel which wil be used to output the results of the callback."
   ([db sql] (prepare db sql []))
   ([db sql params]
-   (let [out chan]
-     (.prepare db sql (clj->js params) (fn [err] 
-                                         (if err (put! out {:error err}) (put! out :success))
-                                         (close! out)))
+   (let [out (chan)
+         stmt (atom nil)]
+     (reset! stmt (.prepare db sql (clj->js params) (fn [err] 
+                                                      (if err (put! out {:error err}) (put! out {:success @stmt}))
+                                                      (close! out))))
      out)))
 
 (defn statement-run
   ([stmt] (statement-run stmt []))
   ([stmt params]
-   (let [out chan] 
+   (let [out (chan)] 
      (.run stmt (clj->js params) (run-cb out))
      out)))
